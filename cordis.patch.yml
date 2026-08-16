@@ -1,0 +1,5 @@
+# Aurora skin bundle patch: inserts its public dsh.client entry into the web plugin roster.
+# 安装命令：dsh plugin --profile <name> add <path-or-git-url>
+- insert:
+    - id: ui-skin-aurora
+      name: 'dsh-client-ui-skin-aurora'

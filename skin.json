@@ -1,0 +1,29 @@
+{
+  "id": "aurora",
+  "name": "极光",
+  "nameEn": "Aurora",
+  "author": "Canye-zdm",
+  "tagline": "近黑夜空 · 流动极光 · 高级克制",
+  "description": "一套面向 DeepSeek Harness WebUI 的极光主题皮肤：近黑蓝夜空配流动的双层极光光带，青蓝为主角、绿紫为配角的克制剂配色，代码极光高亮，深浅双主题。",
+  "tags": [
+    "minimal",
+    "dark",
+    "aurora",
+    "cyan",
+    "elegant",
+    "gradient",
+    "animated"
+  ],
+  "accent": "#4CC3FF",
+  "bodyAttr": "data-dsh-aurora",
+  "package": "dsh-client-ui-skin-aurora",
+  "wiring": {
+    "id": "ui-skin-aurora",
+    "bundleWired": false
+  },
+  "preview": {
+    "light": "preview/preview-light.png",
+    "dark": "preview/preview-dark.png"
+  },
+  "order": 6
+}

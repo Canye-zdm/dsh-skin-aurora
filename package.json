@@ -1,0 +1,35 @@
+{
+  "name": "dsh-client-ui-skin-aurora",
+  "description": "Aurora skin for the dsh web GUI - minimal, high-end dark UI with a single cyan accent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./client": "./client.js",
+    "./skin.json": "./skin.json",
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [],
+      "platform": "web"
+    }
+  },
+  "license": "MIT",
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1"
+  },
+  "files": [
+    "src",
+    "client.js",
+    "cordis.patch.yml",
+    "skin.json",
+    "README.md",
+    "LICENSE"
+  ]
+}
