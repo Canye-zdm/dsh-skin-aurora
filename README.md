@@ -24,7 +24,7 @@ DeepSeek Harness Web GUI 的极光主题皮肤。以近黑蓝夜空为基底，�
 
 | 深色模式 | 浅色模式 |
 |---|---|
-| ![深色模式](preview/preview-dark.png) | ![浅色模式](preview/preview-light.png) |
+| ![深色模式](preview-dark.png) | ![浅色模式](preview-light.png) |
 
 ## 安装
 
