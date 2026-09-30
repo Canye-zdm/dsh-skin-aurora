@@ -64,6 +64,12 @@ body[data-dsh-aurora][data-ds-dark-theme] {
   --dsw-alias-scrollbar-hover-l2: rgba(125, 180, 240, 0.28) !important;
   --dsw-alias-tooltip-bg: #20304e !important;
   --dsw-alias-toast-bg: #1b2942 !important;
+  /* 标题栏 / 标题行配色（桌面版 Electron 通过 --dsw-specific-sidebar-fill 上报窗口标题栏颜色，
+     再配 --dsw-alias-label-primary 决定最小化/最大化/关闭三按钮的图标色） */
+  --dsw-specific-sidebar-fill: #15213a !important;
+  --dsw-specific-sidebar-nav-item-active: rgba(76, 195, 255, 0.15) !important;
+  --dsw-specific-sidebar-nav-item-hover: rgba(76, 195, 255, 0.10) !important;
+  --dsw-specific-sidebar-nav-item-active-accent: #4cc3ff !important;
   --shiki-token-constant: #4cc3ff !important;
   --shiki-token-string: #34d399 !important;
   --shiki-token-comment: #6b7a90 !important;
@@ -208,6 +214,11 @@ body[data-dsh-aurora] {
   --dsw-alias-markdown-citation: rgba(124, 92, 224, 0.12) !important;
   --dsw-alias-markdown-tag: rgba(124, 92, 224, 0.14) !important;
   --dsw-alias-markdown-placeholder: #b9c9dd !important;
+  /* 标题栏 / 标题行配色（浅色） */
+  --dsw-specific-sidebar-fill: #dde7f3 !important;
+  --dsw-specific-sidebar-nav-item-active: rgba(18, 131, 216, 0.12) !important;
+  --dsw-specific-sidebar-nav-item-hover: rgba(18, 131, 216, 0.08) !important;
+  --dsw-specific-sidebar-nav-item-active-accent: #1283d8 !important;
   --shiki-token-constant: #1283d8 !important;
   --shiki-token-string: #0e9f6e !important;
   --shiki-token-comment: #7b90b0 !important;
@@ -289,22 +300,26 @@ body[data-dsh-aurora] :is([class*='sidebarCol'], [data-pane='sidebar']) :is([rol
   box-shadow: inset 2px 0 0 #1283d8 !important;
 }
 
-/* 卡片极光描边（深色）：默认淡青蓝边框，悬浮微亮发光 */
-body[data-dsh-aurora][data-ds-dark-theme] [class*='card'] {
-  border-color: rgba(76, 195, 255, 0.3) !important;
+/* 卡片极光描边（深色）：仅作用于卡片本体。
+   官方 CSS module 命名规律：本体是 _<hash>_card，子元素是 _<hash>_cardTitle /
+   cardContent / cardTrailing 等。因此用「class 以 _card 结尾」精确锁定本体
+   （多类名时 _card 后跟空格），子元素一律不参与——避免每个文字区域各自
+   描一圈边、叠在一起显得冗杂。 */
+body[data-dsh-aurora][data-ds-dark-theme] :is([class$='_card'], [class*='_card ']) {
+  border-color: rgba(76, 195, 255, 0.24) !important;
   transition: border-color 0.25s ease, box-shadow 0.25s ease !important;
 }
-body[data-dsh-aurora][data-ds-dark-theme] [class*='card']:hover {
+body[data-dsh-aurora][data-ds-dark-theme] :is([class$='_card'], [class*='_card ']):hover {
   border-color: rgba(76, 195, 255, 0.9) !important;
   box-shadow: 0 0 0 1px rgba(76, 195, 255, 0.4), 0 0 30px rgba(76, 195, 255, 0.32), 0 0 64px rgba(76, 195, 255, 0.16) !important;
 }
 
-/* 卡片极光描边（浅色） */
-body[data-dsh-aurora] [class*='card'] {
-  border-color: rgba(18, 131, 216, 0.35) !important;
+/* 卡片极光描边（浅色）：同样只针对本体 */
+body[data-dsh-aurora] :is([class$='_card'], [class*='_card ']) {
+  border-color: rgba(18, 131, 216, 0.28) !important;
   transition: border-color 0.25s ease, box-shadow 0.25s ease !important;
 }
-body[data-dsh-aurora] [class*='card']:hover {
+body[data-dsh-aurora] :is([class$='_card'], [class*='_card ']):hover {
   border-color: rgba(18, 131, 216, 0.95) !important;
   box-shadow: 0 0 0 1px rgba(18, 131, 216, 0.45), 0 0 26px rgba(18, 131, 216, 0.35), 0 0 56px rgba(18, 131, 216, 0.18) !important;
 }
@@ -358,6 +373,13 @@ body[data-dsh-aurora] :is([class*='sidebarCol'], [data-pane='sidebar']) :is([cla
       sky.setAttribute("aria-hidden", "true");
       sky.className = "aurora-sky";
       sky.style.cssText = "position:fixed;inset:0;pointer-events:none;z-index:2147483000;";
+      // 桌面版：Electron 的窗口标题栏是半透明 overlay（会透出页面顶部内容），若极光一直铺到
+      // 视口最顶端，标题栏区域与紧邻其下的页面就会出现亮度断层。这里让极光层从标题栏下方
+      // 才开始（官方在 html 上提供 --dsh-windows-titlebar-height，桌面版为 40px）。
+      // Web 版该变量不存在 → top 为 0，视觉与原来完全一致。
+      if (getComputedStyle(document.documentElement).getPropertyValue("--dsh-windows-titlebar-height").trim()) {
+        sky.style.top = "var(--dsh-windows-titlebar-height)";
+      }
       const bandA = document.createElement("div");
       bandA.className = "band aurora-band-a";
       const bandB = document.createElement("div");
@@ -374,12 +396,25 @@ body[data-dsh-aurora] :is([class*='sidebarCol'], [data-pane='sidebar']) :is([cla
       ].join("\n");
       document.head.append(sidebarFix);
 
-      // 6. 卸载清理：Cordis 卸载插件时自动执行，界面完全还原
+      // 6. 摇醒桌面版窗口外观同步（仅桌面版有意义，Web 版无副作用）：
+      //    官方 preload 用一个隐藏探针元素读取 --dsw-specific-sidebar-fill（标题栏填充色）
+      //    与 --dsw-alias-label-primary（最小化/最大化/关闭三按钮的图标色），并通过
+      //    MutationObserver 监听 body 的 style 属性变化后经 IPC 上报给 Electron 主进程。
+      //    皮肤激活时该监听不会自然触发，故写入一个无害的自定义属性来唤醒它；
+      //    此后切换深/浅主题时 data-ds-dark-theme 变化，官方会自行重新上报正确配色。
+      const wakeAppearance = () =>
+        body.style.setProperty("--dsh-aurora-appearance-sync", String(Date.now()));
+      wakeAppearance();
+      window.setTimeout(wakeAppearance, 400);
+
+      // 7. 卸载清理：Cordis 卸载插件时自动执行，界面完全还原
       ctx.effect(() => () => {
         delete body.dataset.dshAurora;
         style.remove();
         sidebarFix.remove();
         sky.remove();
+        // 移除同步属性同样会触发一次上报，使窗口标题栏回到官方配色
+        body.style.removeProperty("--dsh-aurora-appearance-sync");
         if (document.title === SKIN_TITLE) document.title = "DeepSeek Harness";
       }, "ui-skin-aurora: minimal aurora skin");
     }
